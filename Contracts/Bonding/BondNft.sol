@@ -6,9 +6,9 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "Token/ITendies.sol";
-import "Bonding/IBondNft.sol";
-import "Bonding/IVestingCurve.sol";
+import "bonding/ITendies.sol";
+import "bonding/IBondNft.sol";
+import "bonding/IVestingCurve.sol";
 
 
 contract BondNft is ERC721Enumerable, Ownable {

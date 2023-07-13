@@ -13,5 +13,5 @@ interface IBondNft {
 
     function mintBond( address _recipient, Bond memory _bond) external returns (uint256 bondId);
 
-    function getTokenData(uint256 tokenId) external view returns (Bond memory);
+    function getBondData(uint256 tokenId) external view returns (Bond memory);
 }
