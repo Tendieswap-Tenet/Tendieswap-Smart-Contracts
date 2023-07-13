@@ -67,7 +67,7 @@ contract BondVault is IBondVault {
 
     function depositNfts(uint256[] calldata tokenIds) external {
 
-        for (uint256 i = 0; i < tokenIds.length; i++) {
+        for (uint256 i = 0; i < tokenIds.length;) {
             uint256 tokenId = tokenIds[i];
             require(bondNft.ownerOf(tokenId) == msg.sender, "Not Owner");
 
@@ -80,6 +80,10 @@ contract BondVault is IBondVault {
 
             totalPayouts[msg.sender] += bond.payout;
             bondsDeposited[msg.sender].add(tokenId);
+            
+            unchecked {
+                ++i;
+            }
         }
     }
 
@@ -87,9 +91,9 @@ contract BondVault is IBondVault {
 
         EnumerableSet.UintSet storage depositedTokens = bondsDeposited[msg.sender];
 
-        for (uint256 i = 0; i < tokenIds.length; i++) {
+        for (uint256 i = 0; i < tokenIds.length;) {
             uint256 tokenId = tokenIds[i];
-            require(depositedTokens.contains(tokenId), "Token not deposited");
+            require(depositedTokens.remove(tokenId), "Token not deposited");
 
             IBondNft.Bond memory bond = bondNftIBond.getBondData(tokenId);
             totalPayouts[msg.sender] -= bond.payout;
@@ -97,8 +101,10 @@ contract BondVault is IBondVault {
             // Transfer the NFT back to the owner (assuming ERC721)
             bondNft.transferFrom(address(this), msg.sender, tokenId);
 
-            // Remove the withdrawn token from the depositedTokens set
-            depositedTokens.remove(tokenId);
+            unchecked {
+                ++i;
+            }
+
         }
     }
 
@@ -106,8 +112,12 @@ contract BondVault is IBondVault {
 
         uint256[] memory tokens = new uint256[](bondsDeposited[account].length());
 
-        for (uint256 i = 0; i < bondsDeposited[account].length(); i++) {
+        for (uint256 i = 0; i < bondsDeposited[account].length();) {
             tokens[i] = bondsDeposited[account].at(i);
+
+            unchecked {
+                ++i;
+            }
         }
         return tokens;
     }
