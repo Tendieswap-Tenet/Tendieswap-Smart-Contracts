@@ -15,7 +15,7 @@ import "Staking/IBondVault.sol";
 // distributed and the community can show to govern itself.
 //
 // Have fun reading it. Hopefully it's bug-free. God bless.
-contract TendieChef is Ownable {
+contract MasterChef is Ownable {
 
     // Info of each user.
     struct UserInfo {
@@ -177,10 +177,19 @@ contract TendieChef is Ownable {
         }
         uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
         uint256 tendiesReward = multiplier * (tendiesPerBlock) * (pool.allocPoint) / (totalAllocPoint);
-        if (tendies.emissions(1) + tendiesReward <= tendies.emissionsCap(1)) {
-            tendies.mintRewards(1, tendiesReward, address(this));
-            pool.accTendiesPerShare = pool.accTendiesPerShare + (tendiesReward * (1e12) / (lpSupply));
+
+        //Checks emissions aren't maxxed
+        if (tendies.emissions(1) != tendies.emissionsCap(1)) {
+            if (tendies.emissions(1) + tendiesReward < tendies.emissionsCap(1)) {
+                tendies.mintRewards(1, tendiesReward, address(this));
+                pool.accTendiesPerShare = pool.accTendiesPerShare + (tendiesReward * (1e12) / (lpSupply));
+            } else {
+                uint256 finalEmissions = tendies.emissionsCap(1) - tendies.emissions(1);
+                tendies.mintRewards(1, finalEmissions, address(this));
+                pool.accTendiesPerShare = pool.accTendiesPerShare + (finalEmissions * (1e12) / (lpSupply));
+            }
         }
+
         pool.lastRewardBlock = block.number;
     }
 
